@@ -3,44 +3,50 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\PaymentRequest;
 use EdwardMuss\Rave\Facades\Rave as Flutterwave;
 
 class FlutterwaveController extends Controller
 {
-    public function initialize()
+    public function initialize(PaymentRequest $request)
     {
         //This generates a payment reference
         $reference = Flutterwave::generateReference();
 
+        $name = $request->name;
+        $email = $request->email;
+        $phone = $request->phone_number;
+        $amount = $request->amount;
         // Enter the details of the payment
         $data = [
             'payment_options' => 'card,banktransfer',
-            'amount' => 500,
-            'email' => request()->email,
+            'amount' =>$amount,
+            'email' => $email,
             'tx_ref' => $reference,
-            'currency' => "KES",
+            'currency' => "USD",
             'redirect_url' => route('callback'),
             'customer' => [
-                'email' => request()->email,
-                "phone_number" => request()->phone,
-                "name" => request()->name
+                'email' => $email,
+                "phone_number" => $phone,
+                "name" => $name
             ],
 
             "customizations" => [
-                "title" => 'Buy Me Coffee',
+                "title" => 'ATYOSE',
                 "description" => "Let express love of coffee"
             ]
         ];
 
-        $payment = Flutterwave::initializePayment($data);
+     $payment = Flutterwave::initializePayment($data);
 
 
         if ($payment['status'] !== 'success') {
             // notify something went wrong
-            return;
+            return response()->json(['status'=>'fail']);
         }
 
-        return redirect($payment['data']['link']);
+        return $payment;
+        
     }
 
     /**

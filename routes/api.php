@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\FlutterwaveController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,3 +17,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::post('/pay', [FlutterwaveController::class, 'initialize']);
+// The callback url after a payment
+Route::get('/rave/callback', [FlutterwaveController::class, 'callback']);
